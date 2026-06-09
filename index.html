@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>خطة الحفظ والمراجعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1a7a5e;--green-dark:#0f5442;--green-light:#e8f5f0;--green-mid:#d0ece4;
+  --gold:#c9972a;--gold-light:#fdf3dc;--gold-border:#e8d5a0;
+  --orange:#d4651a;--orange-light:#fde8d8;
+  --blue:#1a5f8a;--blue-light:#ddeef8;
+  --red:#c0392b;--red-light:#fff0f0;
+  --gray:#f5f4f0;--gray2:#eceae4;--border:#e2dfd8;
+  --text:#1a1a1a;--muted:#888078;--white:#fff;
+  --r:10px;--r-lg:16px;
+  --shadow:0 2px 8px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Tajawal',sans-serif;background:var(--gray);color:var(--text);min-height:100vh;}
+
+/* ── TOP BAR ── */
+.topbar{
+  background:linear-gradient(135deg,var(--green-dark) 0%,var(--green) 100%);
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;
+  height:56px;position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 12px rgba(15,84,66,.3);
+}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.topbar-icon{width:34px;height:34px;background:rgba(255,255,255,.18);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;}
+.topbar-title{color:#fff;font-size:15px;font-weight:800;line-height:1.2;}
+.topbar-sub{color:rgba(255,255,255,.7);font-size:10px;}
+.topbar-actions{display:flex;gap:6px;}
+.topbar-btn{
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  color:#fff;border-radius:8px;padding:6px 12px;font-family:'Tajawal',sans-serif;
+  font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;
+  transition:background .12s;white-space:nowrap;
+}
+.topbar-btn:hover{background:rgba(255,255,255,.28);}
+.topbar-btn.gold{background:var(--gold);border-color:#a87d20;}
+.topbar-btn.gold:hover{background:#a87d20;}
+
+/* ── MAIN LAYOUT ── */
+.main{max-width:760px;margin:0 auto;padding:14px 12px 80px;}
+
+/* ── SECTION HEADERS ── */
+.section-hd{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin:16px 0 8px;padding-right:4px;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:10px;box-shadow:var(--shadow);}
+.card-body{padding:14px 16px;}
+.card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-header-title{font-size:13px;font-weight:700;color:var(--green-dark);display:flex;align-items:center;gap:6px;}
+
+/* ── GENDER TOGGLE ── */
+.gender-toggle{display:flex;background:var(--gray);border-radius:var(--r);padding:3px;gap:3px;margin-bottom:14px;}
+.gender-opt{flex:1;text-align:center;}
+.gender-opt input{display:none;}
+.gender-opt label{
+  display:block;padding:8px 4px;border-radius:8px;
+  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.gender-opt input:checked + label{background:var(--white);color:var(--green-dark);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-grid.full{grid-template-columns:1fr;}
+.f-group label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600;}
+input[type=text],textarea,select{
+  font-family:'Tajawal',sans-serif;font-size:13px;padding:9px 11px;
+  border:1.5px solid var(--border);border-radius:var(--r);
+  background:var(--white);color:var(--text);width:100%;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(26,122,94,.1);}
+textarea{resize:vertical;min-height:50px;}
+
+/* ── SAVE ROW ── */
+.save-row{display:flex;gap:8px;align-items:center;padding-top:12px;margin-top:12px;border-top:1px solid var(--border);}
+.save-status{font-size:11px;color:var(--green-dark);font-weight:600;}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:'Tajawal',sans-serif;font-size:12px;font-weight:600;
+  padding:8px 14px;border-radius:var(--r);border:1.5px solid var(--border);
+  background:var(--white);color:var(--text);cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;transition:all .12s;white-space:nowrap;
+}
+.btn:hover{background:var(--gray);}
+.btn.primary{background:var(--green);border-color:var(--green-dark);color:#fff;}
+.btn.primary:hover{background:var(--green-dark);}
+.btn.gold-btn{background:var(--gold);border-color:#a87d20;color:#fff;}
+.btn.gold-btn:hover{background:#a87d20;}
+.btn.danger{color:var(--red);border-color:#f0b0b0;}
+.btn.danger:hover{background:var(--red-light);}
+.btn.ghost{color:var(--muted);}
+.btn.ghost:hover{background:var(--gray);}
+.btn.amber{background:var(--gold-light);border-color:var(--gold-border);color:var(--gold);}
+.btn:disabled{opacity:.35;cursor:default;}
+.btn.sm{font-size:11px;padding:5px 10px;}
+.btn.icon{padding:7px;width:32px;height:32px;justify-content:center;}
+
+/* ── TOOLBAR BAR ── */
+.toolbar-bar{
+  display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;
+  background:var(--gray);border-bottom:1px solid var(--border);
+  position:sticky;top:56px;z-index:40;
+}
+
+/* ── DROPDOWN MENUS ── */
+.menu-wrap{position:relative;}
+.menu-trigger{
+  font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;
+  padding:7px 12px;border-radius:var(--r);border:1.5px solid var(--border);
+  background:var(--white);color:var(--green-dark);cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;transition:all .12s;white-space:nowrap;
+}
+.menu-trigger:hover,.menu-wrap.open .menu-trigger{background:var(--green-light);border-color:var(--green);}
+.menu-wrap.open .menu-trigger{border-bottom-left-radius:0;border-bottom-right-radius:0;}
+.dropdown{
+  display:none;position:absolute;top:100%;right:0;min-width:260px;max-width:320px;
+  background:var(--white);border:1.5px solid var(--border);border-radius:0 0 var(--r-lg) var(--r-lg);
+  border-top:none;box-shadow:var(--shadow-md);z-index:200;padding:12px;
+}
+.menu-wrap.open .dropdown{display:block;}
+.drop-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin:10px 0 6px;text-transform:uppercase;}
+.drop-label:first-child{margin-top:0;}
+.drop-divider{height:1px;background:var(--border);margin:10px 0;}
+.chips-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;}
+.chip{
+  font-family:'Tajawal',sans-serif;font-size:11px;padding:4px 10px;
+  border-radius:99px;border:1.5px solid var(--border);background:var(--white);
+  color:var(--text);cursor:pointer;transition:all .12s;
+}
+.chip:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark);}
+.chip.active{background:var(--green);border-color:var(--green-dark);color:#fff;}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  display:flex;align-items:center;gap:10px;padding:6px 14px;
+  background:var(--green-light);border-bottom:1px solid var(--green-mid);
+  font-size:11px;color:var(--green-dark);font-weight:600;
+}
+.status-dot{width:7px;height:7px;background:var(--green);border-radius:50%;flex-shrink:0;}
+
+/* ── TABLE ── */
+.table-scroll{overflow-x:auto;}
+#plan-table{width:100%;border-collapse:collapse;min-width:280px;}
+#plan-table th{
+  background:var(--green-dark);color:#fff;
+  border:1px solid rgba(255,255,255,.15);padding:0;
+}
+#plan-table th .th-inner{display:flex;align-items:center;gap:2px;padding:6px 8px;}
+#plan-table th input{
+  background:transparent!important;border:none!important;border-radius:0!important;
+  color:#fff!important;font-weight:700;font-size:12px;
+  outline:none;width:100%;font-family:'Tajawal',sans-serif;padding:0!important;min-width:44px;
+}
+#plan-table th input::placeholder{color:rgba(255,255,255,.4)!important;}
+#plan-table th .th-btn{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:11px;padding:0 2px;flex-shrink:0;}
+#plan-table th .th-btn:hover{color:#fff;}
+#plan-table th .ins-btn{background:rgba(255,255,255,.18);border:none;color:#fff;cursor:pointer;font-size:11px;font-weight:700;padding:0 4px;border-radius:3px;flex-shrink:0;}
+#plan-table th .ins-btn:hover{background:rgba(255,255,255,.32);}
+
+#plan-table td{padding:0;border:1px solid var(--border);vertical-align:middle;position:relative;}
+#plan-table td input{
+  padding:7px 8px!important;border:none!important;border-radius:0!important;
+  font-size:13px;background:transparent;width:100%;min-width:50px;
+  font-family:'Tajawal',sans-serif;
+}
+#plan-table td input:focus{background:rgba(26,122,94,.06)!important;}
+#plan-table tr:nth-child(even) td{background:#fafaf8;}
+#plan-table tr:nth-child(even) td input{background:transparent;}
+#plan-table tr:nth-child(even) td input:focus{background:rgba(26,122,94,.06)!important;}
+
+#plan-table td.row-ctrl{width:32px;text-align:center;background:var(--gray)!important;border-left:2px solid var(--green-mid);}
+#plan-table td.row-ctrl input{min-width:28px;text-align:center!important;font-weight:700;color:var(--green-dark)!important;font-size:11px!important;}
+#plan-table td.del-td{width:26px;text-align:center;background:var(--gray)!important;}
+#plan-table td.del-td button{background:none;border:none;color:#ccc;cursor:pointer;font-size:13px;padding:2px;line-height:1;}
+#plan-table td.del-td button:hover{color:var(--red);}
+
+/* SPAN ROW */
+#plan-table tr.span-row td{padding:0;border:1px solid var(--border);}
+#plan-table tr.span-row td input{
+  font-weight:800!important;font-size:13px!important;
+  text-align:center!important;width:100%;padding:10px!important;border:none!important;background:transparent;
+}
+
+/* MERGE */
+#plan-table td.merge-sel{outline:2px dashed var(--green);outline-offset:-2px;cursor:cell!important;}
+#plan-table td.merged{font-weight:600;}
+.unmerge-btn{position:absolute;top:2px;left:2px;background:var(--green);color:#fff;border:none;border-radius:3px;font-size:9px;padding:1px 4px;cursor:pointer;z-index:1;opacity:.7;}
+.unmerge-btn:hover{opacity:1;}
+
+/* COLORS */
+.palette{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;flex-shrink:0;}
+.swatch:hover{transform:scale(1.18);}
+.swatch.sel{border-color:var(--text);transform:scale(1.18);}
+.swatch.empty{background:var(--white)!important;border:2px solid var(--border)!important;font-size:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+
+/* COMPACT */
+.compact-mode #plan-table td input{font-size:11px!important;padding:5px 6px!important;}
+.compact-mode #plan-table th input{font-size:11px!important;}
+.compact-mode #plan-table th .th-inner{padding:4px 6px;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;opacity:.5;}
+.empty-state h3{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.empty-state p{font-size:12px;line-height:1.7;}
+
+/* NOTES */
+.notes-wrap{padding:12px 14px;border-top:1px solid var(--border);background:#fafaf8;}
+
+/* PRINT */
+@media print{
+  .no-print{display:none!important;}
+  body{background:#fff;}
+  .card{box-shadow:none;border:none;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  #plan-table th .th-btn,#plan-table th .ins-btn,.del-td,.unmerge-btn{display:none!important;}
+  .topbar,.toolbar-bar,.status-bar{display:none!important;}
+}
+
+@media(max-width:480px){
+  .form-grid{grid-template-columns:1fr;}
+  .topbar-sub{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar no-print">
+  <div class="topbar-brand">
+    <div class="topbar-icon">📖</div>
+    <div>
+      <div class="topbar-title">خطة الحفظ والمراجعة</div>
+      <div class="topbar-sub">صمّم خطتك الخاصة</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="topbar-btn" onclick="exportPlanFile()">⬇ حفظ</button>
+    <label class="topbar-btn" style="cursor:pointer;">
+      ⬆ استيراد
+      <input type="file" accept=".json" onchange="importPlanFile(event)" style="display:none"/>
+    </label>
+    <button class="topbar-btn gold" onclick="openExport()">🖨 تصدير</button>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div id="export-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--white);border-radius:var(--r-lg);padding:22px;width:320px;max-width:94vw;box-shadow:var(--shadow-md);" onclick="event.stopPropagation()">
+    <div style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--green-dark);">🖨 تصدير الخطة</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn primary" onclick="doPrint('portrait');document.getElementById('export-modal').style.display='none'" style="justify-content:center;">📄 طباعة / PDF عمودي (A4)</button>
+      <button class="btn" onclick="doPrint('landscape');document.getElementById('export-modal').style.display='none'" style="justify-content:center;">📋 طباعة / PDF أفقي (A4)</button>
+      <button class="btn gold-btn" onclick="doShare();document.getElementById('export-modal').style.display='none'" style="justify-content:center;">📲 مشاركة كصورة (واتساب)</button>
+    </div>
+    <button class="btn ghost" style="width:100%;justify-content:center;margin-top:10px;" onclick="document.getElementById('export-modal').style.display='none'">إغلاق</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- INFO CARD -->
+<div class="card no-print">
+  <div class="card-header">
+    <div class="card-header-title">👤 بيانات الخطة</div>
+    <div id="save-status" style="font-size:11px;color:var(--green-dark);font-weight:600;"></div>
+  </div>
+  <div class="card-body">
+    <!-- Gender -->
+    <div class="gender-toggle">
+      <div class="gender-opt">
+        <input type="radio" name="gender" id="g-f" value="f" checked onchange="updateGender()"/>
+        <label for="g-f">👩‍🎓 طالبة / معلمة</label>
+      </div>
+      <div class="gender-opt">
+        <input type="radio" name="gender" id="g-m" value="m" onchange="updateGender()"/>
+        <label for="g-m">👨‍🎓 طالب / معلم</label>
+      </div>
+    </div>
+    <!-- Fields -->
+    <div class="form-grid">
+      <div class="f-group"><label id="lbl-student">اسم الطالبة</label><input type="text" id="s-name" placeholder="الاسم الكامل"/></div>
+      <div class="f-group"><label id="lbl-teacher">المعلمة</label><input type="text" id="s-teacher" placeholder="الاسم"/></div>
+      <div class="f-group"><label id="lbl-halaqa">الحلقة</label><input type="text" id="s-halaqa" placeholder="اسم الحلقة"/></div>
+      <div class="f-group"><label>الفترة / التاريخ</label><input type="text" id="s-date" placeholder="مثال: يونيو 2025"/></div>
+    </div>
+    <div class="form-grid full">
+      <div class="f-group"><label>عنوان الخطة</label><input type="text" id="s-title" placeholder="مثال: خطة حفظ جزء عم — الفصل الأول"/></div>
+    </div>
+    <!-- Save -->
+    <div class="save-row">
+      <button class="btn primary sm" onclick="exportPlanFile()">⬇ حفظ كملف</button>
+      <label class="btn sm" style="cursor:pointer;">
+        ⬆ استيراد
+        <input type="file" accept=".json" onchange="importPlanFile(event)" style="display:none"/>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- BUILDER CARD -->
+<div class="card">
+  <!-- Toolbar -->
+  <div class="toolbar-bar no-print">
+
+    <!-- + خطة -->
+    <div class="menu-wrap" id="mw-new">
+      <button class="menu-trigger" onclick="toggleMenu('mw-new')">📋 الجدول ▾</button>
+      <div class="dropdown">
+        <div class="drop-label">أعمدة جاهزة</div>
+        <div class="chips-row">
+          <div class="chip" onclick="addCol('التاريخ');closeMenus()">📅 التاريخ</div>
+          <div class="chip" onclick="addCol('اليوم');closeMenus()">🗓 اليوم</div>
+          <div class="chip" onclick="addCol('الحفظ');closeMenus()">📖 الحفظ</div>
+          <div class="chip" onclick="addCol('المراجعة');closeMenus()">🔄 المراجعة</div>
+          <div class="chip" onclick="addCol('التكرار');closeMenus()">🔢 التكرار</div>
+          <div class="chip" onclick="addCol('التسميع');closeMenus()">🎤 التسميع</div>
+          <div class="chip" onclick="addCol('الصفحات');closeMenus()">📄 الصفحات</div>
+          <div class="chip" onclick="addCol('ملاحظة');closeMenus()">📝 ملاحظة</div>
+          <div class="chip" onclick="addCol('✅ اكتمل');closeMenus()">✅ اكتمل</div>
+          <div class="chip" onclick="addCol('');closeMenus()">+ فارغ</div>
+        </div>
+        <div class="drop-divider"></div>
+        <div class="drop-label">صفوف</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn primary sm" onclick="addRow();closeMenus()">+ صف</button>
+          <button class="btn sm" onclick="addRow(5);closeMenus()">+ 5 صفوف</button>
+          <button class="btn amber sm" onclick="addSpanRow();closeMenus()">↔ صف عنوان</button>
+        </div>
+        <div class="drop-divider"></div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn sm" id="undo-btn" onclick="undo()" disabled style="flex:1;justify-content:center;">↩ تراجع</button>
+          <button class="btn danger sm" onclick="clearTable();closeMenus()" style="flex:1;justify-content:center;">🗑 مسح</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- دمج -->
+    <div class="menu-wrap" id="mw-merge">
+      <button class="menu-trigger" onclick="toggleMenu('mw-merge')">⊞ دمج ▾</button>
+      <div class="dropdown">
+        <div class="drop-label">اختر نوع الدمج ثم اضغط خانتين</div>
+        <div style="display:flex;gap:6px;margin-bottom:4px;">
+          <button id="merge-h-btn" class="btn sm primary" onclick="setMergeMode('h')" style="flex:1;justify-content:center;">↔ أفقي</button>
+          <button id="merge-v-btn" class="btn sm" onclick="setMergeMode('v')" style="flex:1;justify-content:center;">↕ عمودي</button>
+          <button id="merge-off-btn" class="btn sm ghost" onclick="setMergeMode('off')" style="flex:1;justify-content:center;">✕ إيقاف</button>
+        </div>
+        <div id="merge-hint" style="font-size:10px;color:var(--muted);margin-top:6px;padding:6px 8px;background:var(--gray);border-radius:6px;">
+          فعّل الدمج الأفقي أو العمودي، ثم اضغط على الخانة الأولى وبعدها الثانية
+        </div>
+      </div>
+    </div>
+
+    <!-- تنسيق -->
+    <div class="menu-wrap" id="mw-fmt">
+      <button class="menu-trigger" onclick="toggleMenu('mw-fmt')">🎨 تنسيق ▾</button>
+      <div class="dropdown">
+        <div class="drop-label">لون الخانة</div>
+        <div class="palette" style="margin-bottom:10px;">
+          <div class="swatch empty sel" id="sw-none" onclick="selectBg(this,'')">∅</div>
+          <div class="swatch sel" style="background:#fdf3dc;" onclick="selectBg(this,'#fdf3dc')"></div>
+          <div class="swatch" style="background:#fde8d8;" onclick="selectBg(this,'#fde8d8')"></div>
+          <div class="swatch" style="background:#d4651a;" onclick="selectBg(this,'#d4651a')"></div>
+          <div class="swatch" style="background:#fde8e8;" onclick="selectBg(this,'#fde8e8')"></div>
+          <div class="swatch" style="background:#e8f5f0;" onclick="selectBg(this,'#e8f5f0')"></div>
+          <div class="swatch" style="background:#ddeef8;" onclick="selectBg(this,'#ddeef8')"></div>
+          <div class="swatch" style="background:#f0e6f8;" onclick="selectBg(this,'#f0e6f8')"></div>
+          <div class="swatch" style="background:#fff9c4;" onclick="selectBg(this,'#fff9c4')"></div>
+          <div class="swatch" style="background:#e8e8e8;" onclick="selectBg(this,'#e8e8e8')"></div>
+        </div>
+        <div class="drop-label">النص</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+          <button id="fmt-bold" class="btn sm" onclick="toggleBold()" style="font-weight:800;min-width:34px;justify-content:center;">B</button>
+          <select id="fmt-size" onchange="setFontSize(this.value)" style="font-size:12px;padding:5px 7px;border:1.5px solid var(--border);border-radius:var(--r);width:75px;">
+            <option value="">حجم</option>
+            <option value="10px">10</option><option value="11px">11</option>
+            <option value="12px">12</option><option value="13px">13</option>
+            <option value="14px">14</option><option value="16px">16</option>
+            <option value="18px">18</option><option value="20px">20</option>
+          </select>
+          <button id="fmt-r" class="btn sm primary" onclick="setAlign('right')" title="يمين">⇒</button>
+          <button id="fmt-c" class="btn sm" onclick="setAlign('center')" title="وسط">⇔</button>
+          <button id="fmt-l" class="btn sm" onclick="setAlign('left')" title="يسار">⇐</button>
+        </div>
+        <div class="drop-label">لون النص</div>
+        <div class="palette" style="margin-bottom:10px;">
+          <div class="swatch sel" id="tc-0" style="background:#1a1a1a;" onclick="selectTc(this,'#1a1a1a')"></div>
+          <div class="swatch" style="background:#fff;border:1.5px solid #ddd;" onclick="selectTc(this,'#ffffff')"></div>
+          <div class="swatch" style="background:#0f5442;" onclick="selectTc(this,'#0f5442')"></div>
+          <div class="swatch" style="background:#c9972a;" onclick="selectTc(this,'#c9972a')"></div>
+          <div class="swatch" style="background:#c0392b;" onclick="selectTc(this,'#c0392b')"></div>
+          <div class="swatch" style="background:#1a5f8a;" onclick="selectTc(this,'#1a5f8a')"></div>
+          <div class="swatch" style="background:#888078;" onclick="selectTc(this,'#888078')"></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">💡 اضغط داخل الخانة ثم اضغط تطبيق</div>
+        <button class="btn primary sm" onclick="applyFmt()" style="width:100%;justify-content:center;">✅ تطبيق على الخانة المحددة</button>
+        <div class="drop-divider"></div>
+        <button class="btn sm" id="compact-btn" onclick="toggleCompact()" style="width:100%;justify-content:center;">🔍 عرض مضغوط</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STATUS (merge indicator) -->
+  <div class="status-bar no-print" id="status-bar" style="display:none;">
+    <div class="status-dot"></div>
+    <span id="status-text"></span>
+    <button class="btn sm ghost" onclick="setMergeMode('off')" style="margin-right:auto;padding:3px 8px;">✕ إلغاء</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-scroll">
+    <table id="plan-table">
+      <thead><tr id="header-tr"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state" class="empty-state no-print">
+    <div class="es-icon">📋</div>
+    <h3>ابدأ ببناء خطتك</h3>
+    <p>افتح قائمة <strong>الجدول</strong> أعلاه<br/>أضف الأعمدة والصفوف التي تحتاجها</p>
+  </div>
+
+  <!-- NOTES -->
+  <div class="notes-wrap">
+    <textarea id="s-notes" placeholder="ملاحظات إضافية..." rows="2" style="border:none;background:transparent;resize:none;font-size:12px;color:var(--muted);padding:0;box-shadow:none;"></textarea>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+let cols=[], rows=0, colCounter=0;
+let mergeFirst=null, mergeMode='off';
+let lastActiveTd=null, selBg='', selTc='#1a1a1a';
+let fmtBold=false, fmtSize='', fmtAlign='right';
+let history=[], MAX_HIST=30;
+const SAVE_KEY='khitta_v3';
+
+function uid(){ return 'c'+(++colCounter); }
+
+// ── EMPTY STATE ──
+function checkEmpty(){
+  const empty = !cols.length && !document.querySelector('tbody tr');
+  document.getElementById('empty-state').style.display = empty ? 'block' : 'none';
+}
+
+// ── GENDER ──
+function updateGender(){
+  const f = document.querySelector('input[name=gender]:checked').value==='f';
+  document.getElementById('lbl-student').textContent = f?'اسم الطالبة':'اسم الطالب';
+  document.getElementById('lbl-teacher').textContent = f?'المعلمة':'المعلم';
+  document.getElementById('lbl-halaqa').textContent  = f?'الحلقة':'الحلقة / الفصل';
+  window._fem = f;
+}
+window._fem = true;
+
+// ── UNDO ──
+function saveState(){
+  history.push({
+    cols:JSON.parse(JSON.stringify(cols)), rows, colCounter,
+    html:document.getElementById('tbody').innerHTML,
+    hdr:document.getElementById('header-tr').innerHTML
+  });
+  if(history.length>MAX_HIST) history.shift();
+  document.getElementById('undo-btn').disabled=false;
+}
+function undo(){
+  if(!history.length) return;
+  const s=history.pop();
+  cols=s.cols; rows=s.rows; colCounter=s.colCounter;
+  document.getElementById('tbody').innerHTML=s.html;
+  document.getElementById('header-tr').innerHTML=s.hdr;
+  mergeFirst=null; setMergeMode('off');
+  document.getElementById('undo-btn').disabled=!history.length;
+  checkEmpty();
+}
+
+// ── MENUS ──
+function toggleMenu(id){
+  const el=document.getElementById(id);
+  const was=el.classList.contains('open');
+  closeMenus();
+  if(!was) el.classList.add('open');
+}
+function closeMenus(){ document.querySelectorAll('.menu-wrap.open').forEach(e=>e.classList.remove('open')); }
+document.addEventListener('click',e=>{ if(!e.target.closest('.menu-wrap')) closeMenus(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeMenus(); setMergeMode('off'); } });
+
+// ── COLUMNS ──
+function buildTh(id, name){
+  const th=document.createElement('th');
+  th.id='th-'+id;
+  th.innerHTML=`<div class="th-inner">
+    <button class="ins-btn" onclick="event.stopPropagation();addCol('','${id}')">+</button>
+    <input type="text" value="${name}" placeholder="عمود" onchange="cols.find(c=>c.id==='${id}').name=this.value"/>
+    <button class="th-btn" onclick="event.stopPropagation();delCol('${id}')">✕</button>
+  </div>`;
+  return th;
+}
+
+function addCol(name, insertBeforeId=null){
+  saveState();
+  const id=uid();
+  if(insertBeforeId){ const i=cols.findIndex(c=>c.id===insertBeforeId); cols.splice(i,0,{id,name}); }
+  else cols.push({id,name});
+  const th=buildTh(id,name);
+  if(insertBeforeId){ document.getElementById('th-'+insertBeforeId)?.before(th); }
+  else document.getElementById('header-tr').appendChild(th);
+  document.querySelectorAll('tbody tr[data-row]').forEach(tr=>{
+    const td=document.createElement('td');
+    td.innerHTML=`<input type="text" id="cell-${tr.dataset.row}-${id}" placeholder=""/>`;
+    if(insertBeforeId){ const ref=tr.querySelector(`[id$="-${insertBeforeId}"]`)?.closest('td'); ref?tr.insertBefore(td,ref):tr.insertBefore(td,tr.lastChild); }
+    else tr.insertBefore(td,tr.lastChild);
+  });
+  checkEmpty();
+}
+
+function delCol(id){
+  if(!confirm('حذف هذا العمود؟')) return;
+  saveState();
+  cols=cols.filter(c=>c.id!==id);
+  document.getElementById('th-'+id)?.remove();
+  document.querySelectorAll(`td input[id$="-${id}"]`).forEach(el=>el.closest('td')?.remove());
+  checkEmpty();
+}
+
+// ── ROWS ──
+function addRow(n=1){
+  if(!cols.length){ alert('أضف عموداً أولاً من قائمة الجدول'); return; }
+  saveState();
+  const tbody=document.getElementById('tbody');
+  for(let i=0;i<n;i++){
+    rows++; const r=rows;
+    const tr=document.createElement('tr'); tr.dataset.row=r;
+    let html=`<td class="row-ctrl"><input type="text" id="cell-${r}-_row" placeholder="${r}"/></td>`;
+    cols.forEach(c=>{ html+=`<td><input type="text" id="cell-${r}-${c.id}" placeholder=""/></td>`; });
+    html+=`<td class="del-td no-print"><button onclick="delRow(this)">✕</button></td>`;
+    tr.innerHTML=html; tbody.appendChild(tr);
+  }
+  checkEmpty();
+}
+
+function delRow(btn){ saveState(); btn.closest('tr').remove(); checkEmpty(); }
+
+function addSpanRow(){
+  if(!cols.length){ alert('أضف عموداً أولاً'); return; }
+  saveState();
+  rows++; const r=rows;
+  const tr=document.createElement('tr'); tr.dataset.row=r; tr.className='span-row';
+  const bg=selBg||'#fde8d8';
+  const tc=selTc&&selTc!=='#1a1a1a'?selTc:'#d4651a';
+  tr.innerHTML=`<td colspan="${cols.length+1}" style="background:${bg};">
+    <input type="text" id="cell-${r}-_row" placeholder="✦ عنوان أو ملاحظة ممتدة" style="color:${tc};"/>
+  </td><td class="del-td no-print"><button onclick="delRow(this)">✕</button></td>`;
+  const active=lastActiveTd?.closest('tr');
+  const tbody=document.getElementById('tbody');
+  if(active&&active.parentElement===tbody) active.after(tr); else tbody.appendChild(tr);
+  checkEmpty();
+}
+
+function clearTable(){
+  if(!confirm('مسح الجدول كاملاً؟')) return;
+  saveState();
+  document.getElementById('tbody').innerHTML='';
+  document.getElementById('header-tr').innerHTML='';
+  cols=[]; rows=0; colCounter=0; mergeFirst=null;
+  document.getElementById('undo-btn').disabled=true;
+  setMergeMode('off'); checkEmpty();
+}
+
+// ── TRACK ACTIVE ──
+document.addEventListener('focusin',e=>{
+  const td=e.target.closest('td');
+  if(td&&td.closest('#plan-table')) lastActiveTd=td;
+});
+
+// ── COMPACT ──
+let isCompact=false;
+function toggleCompact(){
+  isCompact=!isCompact;
+  document.getElementById('plan-table').closest('.card').classList.toggle('compact-mode',isCompact);
+  const btn=document.getElementById('compact-btn');
+  btn.textContent=isCompact?'🔍 عرض عادي':'🔍 عرض مضغوط';
+  btn.className='btn sm'+(isCompact?' primary':'');
+}
+
+// ── FORMAT ──
+function selectBg(el,color){
+  document.querySelectorAll('#mw-fmt .swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel'); selBg=color;
+}
+function selectTc(el,color){
+  document.querySelectorAll('#mw-fmt .palette:last-of-type .swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel'); selTc=color;
+}
+function toggleBold(){
+  fmtBold=!fmtBold;
+  document.getElementById('fmt-bold').className='btn sm'+(fmtBold?' primary':'');
+}
+function setFontSize(v){ fmtSize=v; }
+function setAlign(a){
+  fmtAlign=a;
+  ['r','c','l'].forEach(x=>{ document.getElementById('fmt-'+x).className='btn sm'+(x===a[0]?' primary':''); });
+}
+function applyFmt(){
+  if(!lastActiveTd){ alert('اضغط داخل خانة أولاً'); return; }
+  const td=lastActiveTd, inp=td.querySelector('input');
+  if(!inp) return;
+  if(selBg==='') td.style.background=''; else if(selBg) td.style.background=selBg;
+  if(fmtBold) inp.style.fontWeight='700'; else inp.style.fontWeight='';
+  if(fmtSize) inp.style.fontSize=fmtSize;
+  inp.style.textAlign=fmtAlign; td.style.textAlign=fmtAlign;
+  inp.style.color=selTc||'';
+  // Flash
+  td.style.outline='2px solid var(--green)';
+  setTimeout(()=>td.style.outline='',500);
+}
+function applyBgToSelected(){
+  if(!lastActiveTd) return;
+  if(selBg==='') lastActiveTd.style.background='';
+  else if(selBg) lastActiveTd.style.background=selBg;
+}
+
+// ── MERGE ──
+function setMergeMode(mode){
+  mergeMode=mode;
+  if(mergeFirst){ mergeFirst.classList.remove('merge-sel'); mergeFirst=null; }
+  ['h','v','off'].forEach(m=>{ const b=document.getElementById('merge-'+m+'-btn'); if(b) b.className='btn sm'+(m===mode?' primary':m==='off'?' ghost':''); });
+  const sb=document.getElementById('status-bar');
+  const st=document.getElementById('status-text');
+  if(mode==='off'){ sb.style.display='none'; document.getElementById('plan-table').style.cursor=''; }
+  else {
+    sb.style.display='flex';
+    st.textContent = mode==='h' ? 'وضع الدمج الأفقي — اضغط الخانة الأولى ثم الثانية في نفس الصف' : 'وضع الدمج العمودي — اضغط الخانة الأولى ثم الثانية في نفس العمود';
+    document.getElementById('plan-table').style.cursor='cell';
+  }
+}
+
+document.getElementById('plan-table').addEventListener('click',e=>{
+  const td=e.target.closest('td');
+  if(!td||td.classList.contains('del-td')||td.classList.contains('row-ctrl')) return;
+  if(e.target.tagName==='BUTTON') return;
+
+  if(mergeMode==='off'){
+    if(e.target.tagName==='INPUT') return;
+    // apply bg on non-input click
+    if(selBg==='') td.style.background='';
+    else if(selBg) td.style.background=selBg;
+    return;
+  }
+
+  e.preventDefault(); e.target.blur();
+
+  if(!mergeFirst){ mergeFirst=td; td.classList.add('merge-sel'); return; }
+  if(mergeFirst===td){ mergeFirst.classList.remove('merge-sel'); mergeFirst=null; return; }
+
+  if(mergeMode==='h'){
+    if(mergeFirst.closest('tr')!==td.closest('tr')){
+      showMergeErr('الدمج الأفقي: اختر خانتين في نفس الصف'); return;
+    }
+    const tds=[...mergeFirst.closest('tr').querySelectorAll('td:not(.del-td):not(.row-ctrl)')];
+    const i1=tds.indexOf(mergeFirst),i2=tds.indexOf(td);
+    const from=Math.min(i1,i2),to=Math.max(i1,i2);
+    if(to-from<1){reset();return;}
+    saveState();
+    const span=to-from+1;
+    const vals=tds.slice(from,to+1).map(t=>t.querySelector('input')?.value||'').filter(Boolean);
+    for(let i=to;i>from;i--) tds[i].remove();
+    mergeFirst.colSpan=span; mergeFirst.classList.remove('merge-sel'); mergeFirst.classList.add('merged');
+    mergeFirst.style.textAlign='center';
+    if(mergeFirst.querySelector('input')){ mergeFirst.querySelector('input').style.textAlign='center'; if(vals.length) mergeFirst.querySelector('input').value=vals.join(' / '); }
+    addUMBtn(mergeFirst,'h',span);
+  } else {
+    const tbody=document.getElementById('tbody');
+    const allR=[...tbody.querySelectorAll('tr[data-row]:not(.span-row)')];
+    const r1=mergeFirst.closest('tr'),r2=td.closest('tr');
+    if(r1===r2){showMergeErr('الدمج العمودي: اختر خانتين في صفوف مختلفة');return;}
+    const gIdx=c=>[...c.closest('tr').querySelectorAll('td:not(.del-td):not(.row-ctrl)')].indexOf(c);
+    if(gIdx(mergeFirst)!==gIdx(td)){showMergeErr('الدمج العمودي: اختر خانتين في نفس العمود');return;}
+    const ri1=allR.indexOf(r1),ri2=allR.indexOf(r2);
+    const fR=Math.min(ri1,ri2),tR=Math.max(ri1,ri2),span=tR-fR+1;
+    saveState();
+    const col=gIdx(mergeFirst),vals=[];
+    for(let i=fR;i<=tR;i++){
+      const c=allR[i].querySelectorAll('td:not(.del-td):not(.row-ctrl)')[col];
+      if(!c) continue;
+      const v=c.querySelector('input')?.value||''; if(v) vals.push(v);
+      if(i>fR) c.style.display='none';
+    }
+    const top=allR[fR].querySelectorAll('td:not(.del-td):not(.row-ctrl)')[col];
+    top.rowSpan=span; top.classList.remove('merge-sel'); top.classList.add('merged');
+    if(vals.length&&top.querySelector('input')) top.querySelector('input').value=vals.join(' / ');
+    addUMBtn(top,'v',span);
+  }
+  mergeFirst=null;
+});
+
+function showMergeErr(msg){
+  document.getElementById('status-text').textContent='⚠️ '+msg;
+  setTimeout(()=>{ if(mergeMode!=='off') document.getElementById('status-text').textContent=mergeMode==='h'?'اضغط الخانة الأولى':'اضغط الخانة الأولى'; },2000);
+  mergeFirst?.classList.remove('merge-sel'); mergeFirst=null;
+}
+
+function addUMBtn(td,type,span){
+  if(td.querySelector('.unmerge-btn')) return;
+  const btn=document.createElement('button');
+  btn.className='unmerge-btn no-print'; btn.textContent=type==='h'?'↔':'↕'; btn.title='إلغاء الدمج';
+  btn.onclick=e=>{
+    e.stopPropagation(); saveState();
+    if(type==='h'){
+      td.colSpan=1; td.classList.remove('merged'); td.style.position=''; btn.remove();
+      for(let i=1;i<span;i++){const n=document.createElement('td');n.innerHTML='<input type="text" placeholder=""/>';td.after(n);}
+    } else {
+      td.rowSpan=1; td.classList.remove('merged'); td.style.position=''; btn.remove();
+      const allR=[...document.getElementById('tbody').querySelectorAll('tr[data-row]:not(.span-row)')];
+      const ri=allR.indexOf(td.closest('tr'));
+      const col=[...td.closest('tr').querySelectorAll('td:not(.del-td):not(.row-ctrl)')].indexOf(td);
+      for(let i=ri+1;i<ri+span&&i<allR.length;i++){const c=allR[i].querySelectorAll('td:not(.del-td):not(.row-ctrl)')[col];if(c)c.style.display='';}
+    }
+  };
+  td.style.position='relative'; td.appendChild(btn);
+}
+
+// ── SAVE/RESTORE ──
+function collectData(){
+  const rows=[];
+  document.querySelectorAll('tbody tr[data-row]').forEach(tr=>{
+    const span=tr.classList.contains('span-row');
+    const rd={row:tr.dataset.row,span,cells:[]};
+    if(span){
+      const inp=tr.querySelector('input');
+      rd.bg=tr.querySelector('td')?.style.background||''; rd.val=inp?.value||''; rd.tc=inp?.style.color||'';
+    } else {
+      tr.querySelectorAll('td:not(.del-td)').forEach((td,i)=>{
+        const inp=td.querySelector('input');
+        rd.cells.push({v:inp?.value||'',bg:td.style.background||'',fw:inp?.style.fontWeight||'',fs:inp?.style.fontSize||'',ta:inp?.style.textAlign||td.style.textAlign||'',tc:inp?.style.color||'',cs:td.colSpan>1?td.colSpan:1,rs:td.rowSpan>1?td.rowSpan:1,hid:td.style.display==='none'});
+      });
+    }
+    rows.push(rd);
+  });
+  return rows;
+}
+
+function buildObj(){
+  return {
+    v:3, gender:document.querySelector('input[name=gender]:checked').value,
+    name:document.getElementById('s-name').value, teacher:document.getElementById('s-teacher').value,
+    halaqa:document.getElementById('s-halaqa').value, date:document.getElementById('s-date').value,
+    title:document.getElementById('s-title').value, notes:document.getElementById('s-notes').value,
+    cols:JSON.parse(JSON.stringify(cols)), cc:colCounter,
+    data:collectData(), at:new Date().toLocaleString('ar-BH')
+  };
+}
+
+function restoreObj(p){
+  const f=p.gender||'f';
+  const gi=document.querySelector(`input[name=gender][value="${f}"]`);
+  if(gi){gi.checked=true;updateGender();}
+  ['name','teacher','halaqa','date','title','notes'].forEach(k=>{ const el=document.getElementById('s-'+k); if(el) el.value=p[k]||''; });
+  cols=p.cols||[]; colCounter=p.cc||0; rows=0;
+  // header
+  const htr=document.getElementById('header-tr'); htr.innerHTML='';
+  cols.forEach(c=>htr.appendChild(buildTh(c.id,c.name||'')));
+  // tbody
+  const tbody=document.getElementById('tbody'); tbody.innerHTML='';
+  (p.data||[]).forEach(rd=>{
+    const r=parseInt(rd.row)||0; if(r>rows)rows=r;
+    const tr=document.createElement('tr'); tr.dataset.row=rd.row;
+    if(rd.span){
+      tr.className='span-row';
+      tr.innerHTML=`<td colspan="${cols.length+1}" style="background:${rd.bg||'#fde8d8'};">
+        <input type="text" id="cell-${rd.row}-_row" value="${rd.val||''}" style="color:${rd.tc||'#d4651a'};"/>
+      </td><td class="del-td no-print"><button onclick="delRow(this)">✕</button></td>`;
+    } else {
+      let html='';
+      rd.cells.forEach((c,i)=>{
+        if(i===0){
+          html+=`<td class="row-ctrl"><input type="text" id="cell-${rd.row}-_row" value="${c.v}" placeholder="${rd.row}" style="text-align:center;font-weight:700;color:var(--green-dark);"/></td>`;
+        } else {
+          const cid=cols[i-1]?.id||'';
+          const cs=c.cs>1?` colspan="${c.cs}"`:''; const rs=c.rs>1?` rowspan="${c.rs}"`:'' ;
+          const dis=c.hid?'display:none;':'';
+          const tds=`${c.bg?'background:'+c.bg+';':''}${dis}${c.ta?'text-align:'+c.ta+';':''}`;
+          const ins=`${c.fw?'font-weight:'+c.fw+';':''}${c.fs?'font-size:'+c.fs+';':''}${c.ta?'text-align:'+c.ta+';':''}${c.tc?'color:'+c.tc+';':''}`;
+          html+=`<td${cs}${rs} style="${tds}"><input type="text" id="cell-${rd.row}-${cid}" value="${c.v}" style="${ins}"/></td>`;
+        }
+      });
+      html+=`<td class="del-td no-print"><button onclick="delRow(this)">✕</button></td>`;
+      tr.innerHTML=html;
+    }
+    tbody.appendChild(tr);
+  });
+  history=[]; document.getElementById('undo-btn').disabled=true; checkEmpty();
+}
+
+function exportPlanFile(){
+  const p=buildObj();
+  const blob=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='خطة_'+(p.name||'unnamed').replace(/[^\u0621-\u064Aw]/g,'_')+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  showStatus('✅ تم حفظ الملف');
+}
+
+function importPlanFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(!p.cols) throw 0;
+      if(!confirm(`استيراد الخطة؟\nالاسم: ${p.name||'—'}\nالتاريخ: ${p.at||'—'}\n\nسيتم استبدال الخطة الحالية.`)) return;
+      restoreObj(p); showStatus('✅ تم الاستيراد بنجاح');
+    }catch{ alert('❌ الملف غير صحيح'); }
+  };
+  reader.readAsText(file); e.target.value='';
+}
+
+function showStatus(msg){
+  const el=document.getElementById('save-status'); el.textContent=msg;
+  setTimeout(()=>el.textContent='',3000);
+}
+
+// ── EXPORT / PRINT ──
+function openExport(){
+  if(!document.getElementById('s-name').value.trim()){alert('يرجى إدخال الاسم أولاً');return;}
+  if(!cols.length){alert('يرجى إضافة أعمدة أولاً');return;}
+  document.getElementById('export-modal').style.display='flex';
+}
+
+function buildDoc(forShare,pageCSS=''){
+  const f=window._fem!==false;
+  const lbl1=f?'توقيع الطالبة':'توقيع الطالب', lbl2=f?'توقيع المعلمة':'توقيع المعلم';
+  const lbl3=f?'المعلمة':'المعلم', lbl4=f?'الطالبة':'الطالب';
+  const name=document.getElementById('s-name').value||'—';
+  const teacher=document.getElementById('s-teacher').value||'';
+  const halaqa=document.getElementById('s-halaqa').value||'';
+  const date=document.getElementById('s-date').value||'';
+  const title=document.getElementById('s-title').value||'خطة الحفظ والمراجعة';
+  const notes=document.getElementById('s-notes').value||'';
+
+  const hdrCells=cols.map(c=>`<th style="background:#0f5442;color:#fff;padding:8px 10px;border:1px solid rgba(255,255,255,.2);font-size:12px;text-align:center;">${c.name||''}</th>`).join('');
+  const bodyRows=[];
+  document.querySelectorAll('tbody tr[data-row]').forEach((tr,i)=>{
+    if(tr.classList.contains('span-row')){
+      const val=tr.querySelector('input')?.value||'';
+      const bg=tr.querySelector('td')?.style.background||'#fde8d8';
+      const tc=tr.querySelector('td input')?.style.color||'#d4651a';
+      bodyRows.push(`<tr><td colspan="${cols.length+2}" style="padding:10px 14px;border:1px solid #e0ddd5;background:${bg};font-weight:800;color:${tc};text-align:center;font-size:13px;">${val}</td></tr>`);
+      return;
+    }
+    const fv=document.getElementById(`cell-${tr.dataset.row}-_row`)?.value||'';
+    let cells=`<td style="padding:7px 8px;border:1px solid #e0ddd5;font-weight:700;color:#0f5442;text-align:center;width:32px;font-size:11px;">${fv}</td>`;
+    tr.querySelectorAll('td:not(.del-td):not(.row-ctrl)').forEach(td=>{
+      const inp=td.querySelector('input'); const val=inp?.value||'';
+      const cs=td.colSpan>1?` colspan="${td.colSpan}"`:''; const rs=td.rowSpan>1?` rowspan="${td.rowSpan}"`:'' ;
+      const bg=td.style.background?`background:${td.style.background};`:'';
+      const dis=td.style.display==='none'?'display:none;':'';
+      const fw=inp?.style.fontWeight?`font-weight:${inp.style.fontWeight};`:'';
+      const fs=inp?.style.fontSize?`font-size:${inp.style.fontSize};`:'font-size:12px;';
+      const ta=(inp?.style.textAlign||td.style.textAlign)?`text-align:${inp?.style.textAlign||td.style.textAlign};`:'';
+      const tc=inp?.style.color?`color:${inp.style.color};`:'';
+      cells+=`<td${cs}${rs} style="padding:7px 8px;border:1px solid #e0ddd5;${bg}${dis}${fw}${fs}${ta}${tc}">${val}</td>`;
+    });
+    bodyRows.push(`<tr style="background:${i%2===0?'#fff':'#f9f8f5'}">${cells}</tr>`);
+  });
+
+  return `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Tajawal',Tahoma,sans-serif;background:#fff;padding:14px;color:#1a1a1a;font-size:12px;}
+.hdr{background:linear-gradient(135deg,#0f5442,#1a7a5e);color:#fff;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;}
+.hdr h1{font-size:17px;font-weight:800;margin-bottom:3px;}
+.hdr .sub{font-size:11px;opacity:.8;}
+.info{display:flex;gap:14px;flex-wrap:wrap;background:#f5f4f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;}
+.ii .lbl{font-size:10px;color:#888;} .ii .val{font-size:13px;font-weight:700;color:#0f5442;}
+table{width:100%;border-collapse:collapse;}
+.notes{background:#f5f4f0;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:11px;color:#555;line-height:1.8;}
+.sign{display:flex;justify-content:space-between;margin-top:18px;font-size:12px;color:#666;padding-top:10px;border-top:1px solid #e0ddd5;}
+${pageCSS}
+@media print{button{display:none;}tr{page-break-inside:avoid;}body{padding:8px;}}
+</style></head><body>
+<div class="hdr"><div style="font-size:26px;margin-bottom:4px;">📖</div><h1>${title}</h1><div class="sub">${halaqa?halaqa+' · ':''}${date}</div></div>
+<div class="info">
+  <div class="ii"><div class="lbl">${lbl4}</div><div class="val">${name}</div></div>
+  ${teacher?`<div class="ii"><div class="lbl">${lbl3}</div><div class="val">${teacher}</div></div>`:''}
+  ${halaqa?`<div class="ii"><div class="lbl">الحلقة</div><div class="val">${halaqa}</div></div>`:''}
+  ${date?`<div class="ii"><div class="lbl">الفترة</div><div class="val">${date}</div></div>`:''}
+</div>
+<table><thead><tr><th style="background:#0f5442;color:#fff;padding:7px 8px;border:1px solid rgba(255,255,255,.2);width:32px;font-size:10px;">#</th>${hdrCells}</tr></thead>
+<tbody>${bodyRows.join('')}</tbody></table>
+${notes?`<div class="notes">📝 <strong>ملاحظات:</strong><br/>${notes.replace(/\n/g,'<br/>')}</div>`:''}
+<div class="sign"><span>${lbl1}: ________________</span><span>${lbl2}: ________________</span></div>
+${!forShare?`<script>window.onload=()=>window.print();<\/script>`:`<div style="margin-top:14px;padding:10px;background:#e8f5f0;border-radius:8px;font-size:12px;color:#0f5442;text-align:center;">📲 خذ screenshot وأرسله على واتساب</div>`}
+</body></html>`;
+}
+
+function doPrint(o='portrait'){
+  const css=o==='landscape'?'@page{size:A4 landscape;}':'@page{size:A4 portrait;}';
+  const w=window.open('','_blank'); w.document.write(buildDoc(false,css)); w.document.close();
+}
+function doShare(){
+  const w=window.open('','_blank'); w.document.write(buildDoc(true,'')); w.document.close();
+}
+
+// ── INIT ──
+addCol('التاريخ'); addCol('اليوم'); addCol('الحفظ'); addCol('التكرار'); addCol('المراجعة');
+addRow(6);
+</script>
+</body>
+</html>
