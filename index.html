@@ -158,12 +158,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3
 </div>
 
 <!-- EXPORT MODAL -->
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <div class="mbg" id="exp-modal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="mbox">
     <h3>🖨 تصدير الخطة</h3>
     <div class="mopts">
       <button class="btn p" onclick="doPrint('p');document.getElementById('exp-modal').classList.remove('open')" style="justify-content:center;">📄 طباعة / PDF عمودي</button>
       <button class="btn" onclick="doPrint('l');document.getElementById('exp-modal').classList.remove('open')" style="justify-content:center;">📋 طباعة / PDF أفقي</button>
+      <button class="btn gold" onclick="saveAsImage();document.getElementById('exp-modal').classList.remove('open')" style="justify-content:center;">🖼 حفظ كصورة (واتساب)</button>
     </div>
     <button class="btn" style="width:100%;justify-content:center;margin-top:8px;" onclick="document.getElementById('exp-modal').classList.remove('open')">إغلاق</button>
   </div>
@@ -222,9 +226,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3
 
       <!-- Special rows -->
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:8px;">صفوف خاصة (اختياري) — مثل الجمعة أو الإجازة</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;">📌 صفوف إضافية</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">مثال: الجمعة — سورة الكهف، أو أسبوع الاختبارات</div>
         <div class="special-rows" id="special-rows"></div>
-        <button class="btn sm" onclick="addSpecial()" style="margin-top:6px;">+ إضافة صف خاص</button>
+        <button class="btn sm" onclick="addSpecial()" style="margin-top:6px;">+ إضافة صف</button>
       </div>
     </div>
   </div>
@@ -411,24 +416,38 @@ function setDayType(i,type){
 
 // ══ SPECIALS ══
 function addSpecial(){
-  specials.push({text:'', color:'#fde8d8', textColor:'#c9972a'});
+  specials.push({text:'', color:'#fde8d8', textColor:'#d4651a', after:999});
   renderSpecials();
 }
 
 function renderSpecials(){
-  document.getElementById('special-rows').innerHTML=specials.map((s,i)=>`
-    <div class="special-row" style="background:${s.color};">
-      <input type="text" value="${s.text}" placeholder="مثال: الجمعة — سورة الكهف فقط" 
-        style="background:transparent;border-color:rgba(0,0,0,.1);"
+  const activeDays = DAYS.map((d,i)=>({d,i})).filter(x=>dayState[x.i].on);
+  const wrap = document.getElementById('special-rows');
+  if(specials.length===0){
+    wrap.innerHTML='<div style="font-size:11px;color:var(--muted);">لا توجد صفوف إضافية بعد</div>';
+    return;
+  }
+  wrap.innerHTML = specials.map((s,i)=>`
+    <div class="special-row" style="background:${s.color};flex-direction:column;gap:5px;">
+      <div style="display:flex;gap:6px;align-items:center;width:100%;flex-wrap:wrap;">
+        <span style="font-size:11px;color:#a87d20;font-weight:600;white-space:nowrap;">الموضع:</span>
+        <select onchange="specials[${i}].after=parseInt(this.value)" style="flex:1;min-width:100px;background:transparent;border-color:rgba(0,0,0,.15);font-size:12px;">
+          <option value="-1" ${s.after===-1?'selected':''}>في البداية</option>
+          ${activeDays.map(x=>`<option value="${x.i}" ${s.after===x.i?'selected':''}>بعد ${x.d}</option>`).join('')}
+          <option value="999" ${s.after===999?'selected':''}>في النهاية</option>
+        </select>
+        <select onchange="setSpecialColor(${i},this.value)" style="width:75px;background:transparent;border-color:rgba(0,0,0,.15);font-size:11px;">
+          <option value="gold">ذهبي</option>
+          <option value="orange">برتقالي</option>
+          <option value="green">أخضر</option>
+          <option value="blue">أزرق</option>
+          <option value="pink">وردي</option>
+        </select>
+        <button class="btn xs danger" onclick="specials.splice(${i},1);renderSpecials()">✕</button>
+      </div>
+      <input type="text" value="${s.text}" placeholder="مثال: الجمعة — سورة الكهف فقط"
+        style="background:transparent;border-color:rgba(0,0,0,.15);width:100%;"
         onchange="specials[${i}].text=this.value"/>
-      <select onchange="setSpecialColor(${i},this.value)" style="width:90px;background:transparent;border-color:rgba(0,0,0,.1);font-size:11px;">
-        <option value="gold" ${s.color==='#fde8d8'?'selected':''}>ذهبي</option>
-        <option value="green" ${s.color==='#e8f5f0'?'selected':''}>أخضر</option>
-        <option value="orange" ${s.color==='#fde8d8'?'':''}>برتقالي</option>
-        <option value="blue" ${s.color==='#ddeef8'?'selected':''}>أزرق</option>
-        <option value="pink" ${s.color==='#fde8e8'?'selected':''}>وردي</option>
-      </select>
-      <button class="btn xs danger" onclick="specials.splice(${i},1);renderSpecials()">✕</button>
     </div>`).join('');
 }
 
@@ -449,23 +468,33 @@ function buildAndPreview(){
 
 function buildRows(){
   const rows=[];
-  const isWeekly2=selTpl==='weekly2';
+  const isW2=selTpl==='weekly2';
+
+  // Add specials with after=-1 (beginning)
+  specials.filter(sp=>sp.text&&sp.after===-1).forEach(sp=>{
+    rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
+  });
 
   DAYS.forEach((d,i)=>{
     const s=dayState[i];
     if(!s.on) return;
 
-    // Check for specials BEFORE this day
-    specials.forEach(sp=>{
-      if(sp.text) rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
-    });
-
     if(s.type==='tathbit'||s.type==='exam'||s.type==='free'){
       const label={tathbit:'تثبيت',exam:'اختبار',free:'إجازة'}[s.type];
       rows.push({type:'span', text:d+' — '+(s.note||label), color:'#fde8d8', textColor:'#d4651a'});
     } else {
-      rows.push({type:'day', day:d, hifz:s.hifz, muraja:s.muraja, repeat:s.repeat||'', note:s.note, dayType:s.type, isWeekly2});
+      rows.push({type:'day', day:d, hifz:s.hifz, muraja:s.muraja, repeat:s.repeat||'', note:s.note, dayType:s.type, isWeekly2:isW2});
     }
+
+    // Add specials after this day
+    specials.filter(sp=>sp.text&&sp.after===i).forEach(sp=>{
+      rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
+    });
+  });
+
+  // Add specials at end
+  specials.filter(sp=>sp.text&&sp.after===999).forEach(sp=>{
+    rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
   });
 
   return rows;
@@ -532,6 +561,64 @@ function renderPreview(rows){
 }
 
 // ══ PRINT ══
+function saveAsImage(){
+  const wrap = document.getElementById('preview-wrap');
+  if(!wrap || !wrap.innerHTML.trim()){
+    toast('افتح معاينة الخطة أولاً','terr'); return;
+  }
+  toast('⏳ جاري تحويل الخطة لصورة...','tinf', 4000);
+
+  // Build a clean printable element
+  const name = document.getElementById('s-name').value || 'unnamed';
+  const title = document.getElementById('s-title').value || 'خطة';
+
+  // Create temp container with white background
+  const container = document.createElement('div');
+  container.style.cssText = `
+    position:fixed;left:-9999px;top:0;
+    background:#fff;padding:20px;
+    font-family:'Tajawal',sans-serif;
+    direction:rtl;width:700px;
+  `;
+  container.innerHTML = wrap.innerHTML;
+
+  // Fix table styles for image
+  container.querySelectorAll('th').forEach(th=>{
+    th.style.background='#0f5442';
+    th.style.color='#fff';
+    th.style.padding='10px';
+    th.style.border='1px solid rgba(255,255,255,.2)';
+    th.style.fontSize='13px';
+  });
+  container.querySelectorAll('td').forEach(td=>{
+    td.style.border='1px solid #e2dfd8';
+    td.style.padding='9px 10px';
+    td.style.fontSize='13px';
+  });
+
+  document.body.appendChild(container);
+
+  html2canvas(container, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    logging: false,
+  }).then(canvas=>{
+    document.body.removeChild(container);
+    canvas.toBlob(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'خطة_' + name.replace(/\s/g,'_') + '.png';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('✅ تم حفظ الصورة — شاركيها على واتساب','tok');
+    }, 'image/png');
+  }).catch(()=>{
+    toast('تعذر تحويل الصورة','terr');
+  });
+}
+
 function openExport(){
   document.getElementById('exp-modal').classList.add('open');
 }
