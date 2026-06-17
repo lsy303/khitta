@@ -244,10 +244,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3
           <option value="5">5 أسابيع</option>
         </select>
       </div>
-      <div class="fg"><label>الحفظ الأسبوعي (نفس لكل أسبوع)</label>
-        <input type="text" id="month-hifz" placeholder="مثال: وجهين + مراجعة 5 أوجه"/>
+      <div class="fg">
+        <label>المطلوب الأسبوعي الافتراضي</label>
+        <input type="text" id="month-hifz" placeholder="مثال: وجهين حفظاً + 5 أوجه مراجعة"/>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">يُطبّق على كل الأيام — أو خصص كل يوم من قسم الأيام أعلاه</div>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin-top:4px;">أو خصص كل أسبوع بالضغط على الأيام في القسم أعلاه</p>
     </div>
   </div>
 
@@ -292,7 +293,6 @@ const TEMPLATES = [
   {id:'weekly', icon:'🗓', name:'أسبوعية', desc:'السبت — الخميس\nحفظ ومراجعة يومية'},
   {id:'weekly2', icon:'📖', name:'أسبوعية موسعة', desc:'مع التكرار والتسميع\nوخانة التوقيع'},
   {id:'monthly', icon:'📆', name:'شهرية', desc:'4 أسابيع مقسمة\nبهدف أسبوعي'},
-  {id:'custom', icon:'✨', name:'مخصصة', desc:'اختر أي أيام\nوخصص كل يوم'},
 ];
 
 let selTpl = 'weekly';
@@ -470,7 +470,32 @@ function buildRows(){
   const rows=[];
   const isW2=selTpl==='weekly2';
 
-  // Add specials with after=-1 (beginning)
+  // ── MONTHLY ──
+  if(selTpl==='monthly'){
+    const weeks = parseInt(document.getElementById('month-weeks').value)||4;
+    const hifz = document.getElementById('month-hifz').value||'';
+    for(let w=1;w<=weeks;w++){
+      // Week header
+      rows.push({type:'span', text:`الأسبوع ${w}`, color:'#e8f5f0', textColor:'#0f5442'});
+      DAYS.forEach((d,i)=>{
+        const s=dayState[i];
+        if(!s.on) return;
+        if(s.type==='tathbit'||s.type==='exam'||s.type==='free'){
+          const label={tathbit:'تثبيت',exam:'اختبار',free:'إجازة'}[s.type];
+          rows.push({type:'span', text:d+' — '+(s.note||label), color:'#fde8d8', textColor:'#d4651a'});
+        } else {
+          rows.push({type:'day', day:d, hifz:s.hifz||hifz, muraja:s.muraja, repeat:s.repeat||'', note:'', dayType:s.type||'both', isWeekly2:false});
+        }
+      });
+      // Specials after this week
+      specials.filter(sp=>sp.text&&sp.after===w-1).forEach(sp=>{
+        rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
+      });
+    }
+    return rows;
+  }
+
+  // ── WEEKLY / WEEKLY2 / CUSTOM ──
   specials.filter(sp=>sp.text&&sp.after===-1).forEach(sp=>{
     rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
   });
@@ -486,13 +511,11 @@ function buildRows(){
       rows.push({type:'day', day:d, hifz:s.hifz, muraja:s.muraja, repeat:s.repeat||'', note:s.note, dayType:s.type, isWeekly2:isW2});
     }
 
-    // Add specials after this day
     specials.filter(sp=>sp.text&&sp.after===i).forEach(sp=>{
       rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
     });
   });
 
-  // Add specials at end
   specials.filter(sp=>sp.text&&sp.after===999).forEach(sp=>{
     rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
   });
