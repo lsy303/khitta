@@ -238,17 +238,46 @@ input:focus,textarea:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3
   <div class="card" id="month-builder" style="display:none;">
     <div class="card-hd">📆 الخطة الشهرية</div>
     <div class="card-bd">
-      <div class="fg"><label>عدد الأسابيع</label>
-        <select id="month-weeks">
+
+      <!-- Mode toggle -->
+      <div class="gtog" style="margin-bottom:14px;">
+        <div class="gopt">
+          <input type="radio" name="mmode" id="mm-gen" value="gen" checked onchange="switchMonthMode('gen')"/>
+          <label for="mm-gen">🔄 عام — نفس المطلوب كل أسبوع</label>
+        </div>
+        <div class="gopt">
+          <input type="radio" name="mmode" id="mm-custom" value="custom" onchange="switchMonthMode('custom')"/>
+          <label for="mm-custom">✏️ مخصص — كل أسبوع مختلف</label>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>عدد الأسابيع</label>
+        <select id="month-weeks" onchange="renderMonthWeeks()">
           <option value="4">4 أسابيع</option>
           <option value="5">5 أسابيع</option>
         </select>
       </div>
-      <div class="fg">
-        <label>المطلوب الأسبوعي الافتراضي</label>
-        <input type="text" id="month-hifz" placeholder="مثال: وجهين حفظاً + 5 أوجه مراجعة"/>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px;">يُطبّق على كل الأيام — أو خصص كل يوم من قسم الأيام أعلاه</div>
+
+      <!-- GENERAL MODE -->
+      <div id="mm-gen-fields">
+        <div class="fg">
+          <label>الحفظ الجديد (يُكرر كل أسبوع)</label>
+          <input type="text" id="month-hifz" placeholder="مثال: وجهين"/>
+        </div>
+        <div class="fg">
+          <label>المراجعة (يُكرر كل أسبوع)</label>
+          <input type="text" id="month-muraja" placeholder="مثال: مراجعة 5 أوجه"/>
+        </div>
+        <div style="font-size:10px;color:var(--muted);">يُطبّق نفس المطلوب على كل أيام الشهر</div>
       </div>
+
+      <!-- CUSTOM MODE -->
+      <div id="mm-custom-fields" style="display:none;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">اكتب المطلوب لكل أسبوع بشكل مختلف</div>
+        <div id="month-weeks-custom"></div>
+      </div>
+
     </div>
   </div>
 
@@ -466,6 +495,54 @@ function buildAndPreview(){
   goStep(3);
 }
 
+// ══ MONTH MODE ══
+let monthMode = 'gen';
+let monthWeeksData = [];
+
+function switchMonthMode(mode){
+  monthMode = mode;
+  document.getElementById('mm-gen-fields').style.display = mode==='gen'?'block':'none';
+  document.getElementById('mm-custom-fields').style.display = mode==='custom'?'block':'none';
+  if(mode==='custom') renderMonthWeeks();
+}
+
+function renderMonthWeeks(){
+  if(monthMode!=='custom') return;
+  const n = parseInt(document.getElementById('month-weeks').value)||4;
+  // Extend monthWeeksData
+  while(monthWeeksData.length<n){
+    monthWeeksData.push(DAYS.map(()=>({hifz:'',muraja:''})));
+  }
+  monthWeeksData = monthWeeksData.slice(0,n);
+
+  const activeDays = DAYS.map((d,i)=>({d,i})).filter(x=>dayState[x.i].on);
+
+  document.getElementById('month-weeks-custom').innerHTML = monthWeeksData.map((wk,wi)=>`
+    <div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;">
+      <div style="background:var(--gl);padding:9px 14px;font-size:13px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--border);">
+        الأسبوع ${wi+1}
+      </div>
+      ${activeDays.map(({d,i})=>`
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:${wi%2===0?'#fff':'#fafaf8'};">
+          <div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:5px;">${d}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div>
+              <div style="font-size:9px;color:var(--muted);margin-bottom:2px;">الحفظ</div>
+              <input type="text" value="${wk[i]?.hifz||''}" placeholder="..."
+                style="font-size:12px;padding:6px 8px;"
+                onchange="monthWeeksData[${wi}][${i}].hifz=this.value"/>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--muted);margin-bottom:2px;">المراجعة</div>
+              <input type="text" value="${wk[i]?.muraja||''}" placeholder="..."
+                style="font-size:12px;padding:6px 8px;"
+                onchange="monthWeeksData[${wi}][${i}].muraja=this.value"/>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
 function buildRows(){
   const rows=[];
   const isW2=selTpl==='weekly2';
@@ -473,10 +550,12 @@ function buildRows(){
   // ── MONTHLY ──
   if(selTpl==='monthly'){
     const weeks = parseInt(document.getElementById('month-weeks').value)||4;
-    const hifz = document.getElementById('month-hifz').value||'';
+    const genHifz = document.getElementById('month-hifz').value||'';
+    const genMuraja = document.getElementById('month-muraja')?.value||'';
+
     for(let w=1;w<=weeks;w++){
-      // Week header
       rows.push({type:'span', text:`الأسبوع ${w}`, color:'#e8f5f0', textColor:'#0f5442'});
+
       DAYS.forEach((d,i)=>{
         const s=dayState[i];
         if(!s.on) return;
@@ -484,12 +563,17 @@ function buildRows(){
           const label={tathbit:'تثبيت',exam:'اختبار',free:'إجازة'}[s.type];
           rows.push({type:'span', text:d+' — '+(s.note||label), color:'#fde8d8', textColor:'#d4651a'});
         } else {
-          rows.push({type:'day', day:d, hifz:s.hifz||hifz, muraja:s.muraja, repeat:s.repeat||'', note:'', dayType:s.type||'both', isWeekly2:false});
+          let hifz, muraja;
+          if(monthMode==='custom'){
+            const wk = monthWeeksData[w-1]||[];
+            hifz = wk[i]?.hifz||'';
+            muraja = wk[i]?.muraja||'';
+          } else {
+            hifz = genHifz;
+            muraja = genMuraja;
+          }
+          rows.push({type:'day', day:d, hifz, muraja, repeat:'', note:'', dayType:'both', isWeekly2:false});
         }
-      });
-      // Specials after this week
-      specials.filter(sp=>sp.text&&sp.after===w-1).forEach(sp=>{
-        rows.push({type:'span', text:sp.text, color:sp.color, textColor:sp.textColor});
       });
     }
     return rows;
