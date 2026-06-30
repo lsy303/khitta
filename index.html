@@ -107,7 +107,23 @@ input:focus,textarea:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3
 .plan-tbl tr:nth-child(even):not(.span-r):not(.header-r) td{background:#fafaf8;}
 .plan-tbl td.day-col{font-weight:700;color:var(--gd);text-align:center;width:70px;}
 .plan-tbl td.num-col{color:var(--muted);font-size:11px;text-align:center;width:28px;}
+
+/* EDITABLE CELLS */
+.plan-tbl td.editable{padding:0;}
+.plan-tbl td.editable input{
+  width:100%;padding:8px 10px;border:none;background:transparent;
+  font-family:'Tajawal',sans-serif;font-size:13px;color:var(--text);
+  outline:none;min-width:60px;
+}
+.plan-tbl td.editable input:focus{background:rgba(26,122,94,.06);}
+.plan-tbl td.editable.day-col input{font-weight:700;color:var(--gd);text-align:center;}
+.plan-tbl td.editable.num-col input{color:var(--muted);font-size:11px;text-align:center;}
+.plan-tbl td.editable.date-col input{color:#555;font-size:11px;text-align:center;}
+.plan-tbl tr.span-r td.editable input{
+  font-weight:800;font-size:13px;text-align:center;color:inherit;
+}
 .plan-tbl td.sig-col{width:70px;}
+
 .check-col{text-align:center;font-size:16px;}
 
 /* TOAST */
@@ -191,6 +207,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3
         <div class="fg"><label id="lt">المعلمة</label><input type="text" id="s-teacher" placeholder="الاسم"/></div>
         <div class="fg"><label>الحلقة</label><input type="text" id="s-halaqa" placeholder="اسم الحلقة"/></div>
         <div class="fg"><label>الفترة</label><input type="text" id="s-date" placeholder="مثال: يونيو 2025"/></div>
+        <div class="fg"><label>تاريخ البداية <span style="font-size:10px;color:var(--muted);">(اختياري — لحساب التواريخ تلقائياً)</span></label><input type="date" id="s-start-date" style="font-family:'Tajawal',sans-serif;"/></div>
       </div>
       <div class="fg"><label>عنوان الخطة</label><input type="text" id="s-title" placeholder="مثال: خطة حفظ الأحقاف — الفصل الأول"/></div>
     </div>
@@ -547,6 +564,17 @@ function buildRows(){
   const rows=[];
   const isW2=selTpl==='weekly2';
 
+  // Calculate start date
+  const startVal = document.getElementById('s-start-date').value;
+  let curDate = startVal ? new Date(startVal) : null;
+
+  function nextDate(){
+    if(!curDate) return '';
+    const d = curDate.toLocaleDateString('ar-BH',{day:'numeric',month:'numeric'});
+    curDate = new Date(curDate); curDate.setDate(curDate.getDate()+1);
+    return d;
+  }
+
   // ── MONTHLY ──
   if(selTpl==='monthly'){
     const weeks = parseInt(document.getElementById('month-weeks').value)||4;
@@ -572,7 +600,7 @@ function buildRows(){
             hifz = genHifz;
             muraja = genMuraja;
           }
-          rows.push({type:'day', day:d, hifz, muraja, repeat:'', note:'', dayType:'both', isWeekly2:false});
+          rows.push({type:'day', day:d, date:nextDate(), hifz, muraja, repeat:'', note:'', dayType:'both', isWeekly2:false});
         }
       });
     }
@@ -592,7 +620,7 @@ function buildRows(){
       const label={tathbit:'تثبيت',exam:'اختبار',free:'إجازة'}[s.type];
       rows.push({type:'span', text:d+' — '+(s.note||label), color:'#fde8d8', textColor:'#d4651a'});
     } else {
-      rows.push({type:'day', day:d, hifz:s.hifz, muraja:s.muraja, repeat:s.repeat||'', note:s.note, dayType:s.type, isWeekly2:isW2});
+      rows.push({type:'day', day:d, date:nextDate(), hifz:s.hifz, muraja:s.muraja, repeat:s.repeat||'', note:s.note, dayType:s.type, isWeekly2:isW2});
     }
 
     specials.filter(sp=>sp.text&&sp.after===i).forEach(sp=>{
@@ -616,6 +644,9 @@ function renderPreview(rows){
   const f=window._fem!==false;
   const isW2=selTpl==='weekly2';
 
+  const hasDate = !!document.getElementById('s-start-date').value;
+  const dateCols = hasDate ? 1 : 0;
+
   let html=`<div style="padding:14px 16px;border-bottom:1px solid var(--border);">
     <div style="font-size:15px;font-weight:800;color:var(--gd);margin-bottom:10px;">${title}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:12px;">
@@ -629,6 +660,7 @@ function renderPreview(rows){
   <table class="plan-tbl">
     <thead><tr>
       <th style="width:28px;">#</th>
+      ${hasDate?'<th style="width:65px;">التاريخ</th>':''}
       <th>اليوم</th>
       <th>الحفظ الجديد</th>
       <th>المراجعة</th>
@@ -640,18 +672,19 @@ function renderPreview(rows){
   let n=0;
   rows.forEach(r=>{
     if(r.type==='span'){
-      const cols=3+(isW2?1:0)+2;
-      html+=`<tr class="span-r"><td colspan="${cols}" style="background:${r.color};color:${r.textColor};">${r.text}</td></tr>`;
+      const cols=3+dateCols+(isW2?1:0)+2;
+      html+=`<tr class="span-r"><td colspan="${cols}" class="editable" style="background:${r.color};color:${r.textColor};"><input type="text" value="${r.text}" style="font-weight:800;font-size:13px;text-align:center;color:${r.textColor};"/></td></tr>`;
     } else {
       n++;
       const hifz=r.hifz||'—';
       const muraja=r.muraja||'—';
       html+=`<tr>
-        <td class="num-col">${n}</td>
-        <td class="day-col">${r.day}</td>
-        <td>${r.dayType==='muraja'?'—':hifz}</td>
-        <td>${r.dayType==='hifz'?'—':muraja}</td>
-        ${isW2?`<td style="text-align:center;">${r.repeat||'—'}</td>`:''}
+        <td class="num-col editable"><input type="text" value="${n}" style="width:28px;text-align:center;color:var(--muted);font-size:11px;"/></td>
+        ${hasDate?`<td class="editable date-col"><input type="text" value="${r.date||''}"/></td>`:''}
+        <td class="day-col editable"><input type="text" value="${r.day}"/></td>
+        <td class="editable"><input type="text" value="${r.dayType==='muraja'?'':hifz}" placeholder="—"/></td>
+        <td class="editable"><input type="text" value="${r.dayType==='hifz'?'':muraja}" placeholder="—"/></td>
+        ${isW2?`<td class="editable" style="text-align:center;"><input type="text" value="${r.repeat||''}" placeholder="—" style="text-align:center;"/></td>`:''}
         <td class="sig-col"></td>
       </tr>`;
     }
@@ -738,22 +771,44 @@ function doPrint(o){
   const halaqa=document.getElementById('s-halaqa').value||'';
   const date=document.getElementById('s-date').value||'';
   const isW2=selTpl==='weekly2';
+  const hasDate = !!document.getElementById('s-start-date').value;
+  const dateCols = hasDate ? 1 : 0;
   const pageCSS=o==='l'?'@page{size:A4 landscape;}':'@page{size:A4 portrait;}';
+
+  // Read all current values from editable preview table
+  const previewTbl = document.querySelector('#preview-wrap table');
 
   let bodyRows=''; let n=0;
   planRows.forEach(r=>{
     if(r.type==='span'){
-      const cols=3+(isW2?1:0)+2;
-      bodyRows+=`<tr><td colspan="${cols}" style="background:${r.color};color:${r.textColor};font-weight:800;text-align:center;padding:10px 12px;border:1px solid ${r.color};">${r.text}</td></tr>`;
+      const cols=3+dateCols+(isW2?1:0)+2;
+      // Read edited span text from DOM
+      const spanInputs = document.querySelectorAll('#preview-wrap table tr.span-r input');
+      const spanIdx = [...document.querySelectorAll('#preview-wrap table tr')].filter(tr=>tr.classList.contains('span-r')).indexOf(
+        [...document.querySelectorAll('#preview-wrap table tr.span-r')][bodyRows.split('span-r').length-1]
+      );
+      const spanText = spanInputs[bodyRows.split('span-r').length-1]?.value || r.text;
+      bodyRows+=`<tr><td colspan="${cols}" style="background:${r.color};color:${r.textColor};font-weight:800;text-align:center;padding:10px 12px;border:1px solid ${r.color};">${spanText}</td></tr>`;
     } else {
       n++;
       const bg=n%2===0?'#f9f8f5':'#fff';
+      // Read edited values from DOM inputs
+      const tblRows = document.querySelectorAll('#preview-wrap table tr:not(.span-r)');
+      const domRow = [...tblRows].filter(tr=>tr.querySelectorAll('input').length>1)[n-1];
+      const getVal = (domRow, idx) => domRow ? (domRow.querySelectorAll('input')[idx]?.value||'') : '';
+      const numCols = hasDate ? 1 : 0;
+      const dispDate = hasDate ? getVal(domRow, numCols) : '';
+      const dispDay  = getVal(domRow, numCols + (hasDate?1:0)) || r.day;
+      const dispHifz = getVal(domRow, numCols + (hasDate?1:0) + 1) || (r.dayType==='muraja'?'—':r.hifz||'—');
+      const dispMuraja = getVal(domRow, numCols + (hasDate?1:0) + 2) || (r.dayType==='hifz'?'—':r.muraja||'—');
+      const dispRepeat = isW2 ? (getVal(domRow, numCols + (hasDate?1:0) + 3) || r.repeat||'—') : '';
       bodyRows+=`<tr style="background:${bg};">
         <td style="text-align:center;color:#888;font-size:11px;width:28px;border:1px solid #e2dfd8;">${n}</td>
-        <td style="font-weight:700;color:#0f5442;text-align:center;width:70px;border:1px solid #e2dfd8;">${r.day}</td>
-        <td style="border:1px solid #e2dfd8;">${r.dayType==='muraja'?'—':r.hifz||'—'}</td>
-        <td style="border:1px solid #e2dfd8;">${r.dayType==='hifz'?'—':r.muraja||'—'}</td>
-        ${isW2?`<td style="text-align:center;width:70px;border:1px solid #e2dfd8;">${r.repeat||'—'}</td>`:''}
+        ${hasDate?`<td style="text-align:center;color:#555;font-size:11px;width:55px;border:1px solid #e2dfd8;">${dispDate}</td>`:''}
+        <td style="font-weight:700;color:#0f5442;text-align:center;width:70px;border:1px solid #e2dfd8;">${dispDay}</td>
+        <td style="border:1px solid #e2dfd8;">${dispHifz}</td>
+        <td style="border:1px solid #e2dfd8;">${dispMuraja}</td>
+        ${isW2?`<td style="text-align:center;width:70px;border:1px solid #e2dfd8;">${dispRepeat}</td>`:''}
         <td style="width:80px;border:1px solid #e2dfd8;"></td>
       </tr>`;
     }
@@ -784,6 +839,7 @@ ${pageCSS}
 </div>
 <table><thead><tr>
   <th style="width:28px;">#</th>
+  ${hasDate?'<th style="width:55px;">التاريخ</th>':''}
   <th style="width:70px;">اليوم</th>
   <th>الحفظ الجديد</th>
   <th>المراجعة</th>
@@ -811,6 +867,7 @@ function savePlan(){
     teacher:document.getElementById('s-teacher').value,
     halaqa:document.getElementById('s-halaqa').value,
     date:document.getElementById('s-date').value,
+    startDate:document.getElementById('s-start-date').value,
     title:document.getElementById('s-title').value,
     tpl:selTpl, dayState, specials,
     at:new Date().toLocaleString('ar-BH')
@@ -831,7 +888,7 @@ function loadPlan(event){
       const d=JSON.parse(e.target.result);
       const gi=document.querySelector(`input[name=g][value="${d.gender||'f'}"]`);
       if(gi){gi.checked=true;upd();}
-      ['name','teacher','halaqa','date','title'].forEach(k=>{
+      ['name','teacher','halaqa','date','title','start-date'].forEach(k=>{
         const el=document.getElementById('s-'+k); if(el) el.value=d[k]||'';
       });
       if(d.dayState) dayState=d.dayState;
